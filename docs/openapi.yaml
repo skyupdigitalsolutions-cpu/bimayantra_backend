@@ -1,0 +1,784 @@
+openapi: 3.1.0
+info:
+  title: Bimayantra API
+  version: 1.0.0 (Phases 1–6)
+  description: |
+    Business Process Document v3.2 — Phase 1: global rules, P-01 to P-04, step-up OTP (NFR-13).
+
+    **Clients.** The website calls through its own `/api/v1` proxy and holds the session in HttpOnly
+    cookies (`bm_at`, `bm_rt`). The mobile app sends `X-Client: mobile`, receives the tokens in the
+    response headers `X-Access-Token` / `X-Refresh-Token`, sends `Authorization: Bearer <access>`, and
+    calls `POST /auth/refresh` when it gets 401 with `reason: access_expired`. Same rules for both.
+
+    **Errors** (Section 2.5) always look like `ErrorBody`. 422 field errors list each field; two or more
+    give GEN-02. 409 `GEN-06` with `reason: replay` carries the saved `result` (GR-10).
+
+    **Idempotency** (GR-10): send `Idempotency-Key` (16–100 characters, made when the form opens; a retry
+    reuses it). Required where marked. `GET /requests/{key}` is "Check status" (GR-17).
+
+    **Step-up** (CFG-83): sensitive actions need `X-Step-Up-Token` from `POST /auth/step-up/send` +
+    `/auth/step-up/verify` for that one action (APPROVE, PUBLISH, PLAN_CHANGE, CONFIG_CHANGE, SUPPORT_GRANT,
+    ADD_ASSISTANT, USER_CHANGE, ACCOUNT_STATUS, EXPORT, WALLET_CREDIT).
+servers:
+  - url: /api/v1
+components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      schema: { type: string, minLength: 16, maxLength: 100, pattern: '^[A-Za-z0-9_-]+$' }
+    IdempotencyKeyRequired:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 16, maxLength: 100, pattern: '^[A-Za-z0-9_-]+$' }
+    MobileClient:
+      name: X-Client
+      in: header
+      description: '"mobile" for the app (tokens in headers instead of cookies)'
+      schema: { type: string, enum: [mobile] }
+  securitySchemes:
+    cookie: { type: apiKey, in: cookie, name: bm_at }
+    bearer: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    Msg:
+      type: object
+      required: [code, text]
+      properties:
+        code: { type: string, example: AUTH-01 }
+        text: { type: string }
+    ErrorBody:
+      type: object
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string, example: AUTH-02 }
+            message: { type: string, example: The code is incorrect. You have 4 tries left. }
+            params: { type: object }
+            fields:
+              type: array
+              items:
+                type: object
+                properties:
+                  field: { type: string }
+                  code: { type: string }
+                  message: { type: string }
+            errorId: { type: string, description: Only with GEN-99 }
+            reason: { type: string }
+            retryAfterSeconds: { type: integer }
+            result: { description: The saved result (GEN-06 replay) }
+    OtpSent:
+      type: object
+      properties:
+        challengeId: { type: string, format: uuid }
+        maskedMobile: { type: string, example: 98XXXXXX21 }
+        expiresAt: { type: string, format: date-time }
+        resendAfterSeconds: { type: integer, description: CFG-04 countdown }
+        resent: { type: boolean, description: false = inside CFG-04, the existing code is still valid (AUTH-05) }
+        message: { $ref: '#/components/schemas/Msg' }
+    OtpVerify:
+      type: object
+      required: [challengeId, code]
+      properties:
+        challengeId: { type: string, format: uuid }
+        code: { type: string, description: FLD-18 }
+        next: { type: string, description: Deep link to open after sign-in if the role may see it }
+    SignedIn:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id: { type: string, format: uuid }
+            name: { type: string }
+            role: { type: string, enum: [ADV, AST, REF, STF, ADM] }
+            mobile: { type: string, example: '+919845012345' }
+        redirectTo: { type: string, example: /dashboard }
+        readOnly: { type: boolean, description: GR-33 }
+        message: { $ref: '#/components/schemas/Msg' }
+        banner: { $ref: '#/components/schemas/Msg' }
+  responses:
+    Error:
+      description: Error (Section 2.5)
+      content: { application/json: { schema: { $ref: '#/components/schemas/ErrorBody' } } }
+security:
+  - cookie: []
+  - bearer: []
+paths:
+  /public-settings:
+    get:
+      summary: Live CFG values the clients need (OTP length, resend wait, idle warning, timeouts)
+      security: []
+      responses: { '200': { description: OK } }
+  /requests/{key}:
+    get:
+      summary: Check status (GR-17) — COMPLETED (GEN-20, with result) / NOT_COMPLETED (GEN-21) / IN_PROGRESS (GEN-13)
+      security: []
+      parameters: [{ name: key, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { description: OK } }
+  /auth/register/send-otp:
+    post:
+      summary: P-01 step 2–3 — send the registration OTP
+      security: []
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, mobile, termsAccepted]
+              properties:
+                name: { type: string, description: FLD-02 }
+                mobile: { type: string, description: FLD-01 }
+                termsAccepted: { type: boolean, const: true, description: FLD-24 }
+      responses:
+        '200': { description: AUTH-01 or AUTH-05, content: { application/json: { schema: { $ref: '#/components/schemas/OtpSent' } } } }
+        '422': { $ref: '#/components/responses/Error' }
+        '429': { description: 'AUTH-04, AUTH-06, GEN-15', content: { application/json: { schema: { $ref: '#/components/schemas/ErrorBody' } } } }
+        '503': { description: AUTH-13 (SMS provider down) }
+  /auth/register/verify:
+    post:
+      summary: P-01 step 4–5 — create the account (AUTH-15), sign in an existing advisor (AUTH-07), or AUTH-08
+      security: []
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKeyRequired' }, { $ref: '#/components/parameters/MobileClient' }]
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/OtpVerify' } } } }
+      responses:
+        '200': { description: Signed in, content: { application/json: { schema: { $ref: '#/components/schemas/SignedIn' } } } }
+        '409': { description: 'AUTH-08, GEN-06 replay' }
+        '422': { description: 'VAL-19, AUTH-02, AUTH-03' }
+        '429': { description: 'AUTH-04, GEN-15' }
+  /auth/login/send-otp:
+    post:
+      summary: P-02 step 1–2 — AUTH-09 for an unknown number (no SMS)
+      security: []
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { content: { application/json: { schema: { type: object, required: [mobile], properties: { mobile: { type: string } } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/OtpSent' } } } }
+        '422': { $ref: '#/components/responses/Error' }
+  /auth/login/verify:
+    post:
+      summary: P-02 step 3–7 — checks account status, user status, role; AUTH-10/11/14/19/20 refuse
+      security: []
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }, { $ref: '#/components/parameters/MobileClient' }]
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/OtpVerify' } } } }
+      responses:
+        '200': { description: Signed in (AUTH-12 on an invited user's first login), content: { application/json: { schema: { $ref: '#/components/schemas/SignedIn' } } } }
+        '403': { description: 'AUTH-10, AUTH-11, AUTH-14, AUTH-19, AUTH-20' }
+  /auth/otp/cancel:
+    post:
+      summary: Change number link — the open challenge becomes REPLACED
+      security: []
+      requestBody: { content: { application/json: { schema: { type: object, properties: { challengeId: { type: string } } } } } }
+      responses: { '200': { description: OK } }
+  /auth/me:
+    get:
+      summary: Signed-in user, home screen, subscription, read-only state (SUB-03)
+      responses: { '200': { description: OK }, '401': { description: 'GEN-09, AUTH-17, AUTH-18' } }
+  /auth/session:
+    get:
+      summary: P-03 idle and maximum session times for the AUTH-21 warning (not counted as activity)
+      responses: { '200': { description: OK } }
+  /auth/keep-alive:
+    post:
+      summary: Stay signed in (resets the idle timer)
+      responses: { '200': { description: OK } }
+  /auth/refresh:
+    post:
+      summary: Mobile app only — new tokens in X-Access-Token / X-Refresh-Token
+      security: []
+      parameters: [{ $ref: '#/components/parameters/MobileClient' }]
+      requestBody: { content: { application/json: { schema: { type: object, required: [refreshToken], properties: { refreshToken: { type: string } } } } } }
+      responses: { '200': { description: OK }, '401': { description: 'GEN-09, AUTH-17, AUTH-18' } }
+  /auth/logout:
+    post:
+      summary: Log out (AUTH-16); works when already logged out
+      security: []
+      responses: { '200': { description: OK } }
+  /auth/sessions:
+    get:
+      summary: Settings → Security → Active sessions
+      responses: { '200': { description: OK } }
+  /auth/sessions/{id}/end:
+    post:
+      summary: End a session (AUTH-22); repeat-safe; another user's session → 404 GEN-11
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses: { '200': { description: OK }, '404': { description: GEN-11 } }
+  /auth/mobile/send-current-otp:
+    post:
+      summary: P-04 step 2 — OTP to the current number (purpose CHANGE_MOBILE)
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: OK } }
+  /auth/mobile/verify-current:
+    post:
+      summary: P-04 step 2 — returns a ticket for step 3 (valid CFG-02, this session only)
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/OtpVerify' } } } }
+      responses: { '200': { description: OK } }
+  /auth/mobile/send-new-otp:
+    post:
+      summary: P-04 step 3 — AUTH-24 same number, AUTH-25 used by another user
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody: { content: { application/json: { schema: { type: object, required: [ticketId, newMobile], properties: { ticketId: { type: string }, newMobile: { type: string } } } } } }
+      responses: { '200': { description: OK }, '409': { description: GEN-04 (ticket expired) }, '422': { description: 'VAL-01, AUTH-24, AUTH-25' } }
+  /auth/mobile/verify-new:
+    post:
+      summary: P-04 step 4 — change the number, end other sessions, notify the old number (AUTH-23)
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKeyRequired' }]
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/OtpVerify' } } } }
+      responses: { '200': { description: OK }, '422': { description: 'AUTH-02, AUTH-03, AUTH-25' } }
+  /auth/step-up/send-otp:
+    post:
+      summary: Step-up OTP before a sensitive action (CFG-83, AUTH-26)
+      requestBody: { content: { application/json: { schema: { type: object, required: [action], properties: { action: { type: string, enum: [APPROVE, PUBLISH, PLAN_CHANGE, CONFIG_CHANGE, SUPPORT_GRANT] } } } } } }
+      responses: { '200': { description: OK } }
+  /auth/step-up/verify:
+    post:
+      summary: Returns a single-use stepUpToken for that action (valid CFG-02); send it as X-Step-Up-Token
+      requestBody: { content: { application/json: { schema: { $ref: '#/components/schemas/OtpVerify' } } } }
+      responses: { '200': { description: OK } }
+  # ---------------- Phase 2 ----------------
+  /files:
+    post:
+      summary: 'Upload (multipart, fields "purpose" and "files"; header X-Upload 1). VAL-23 type, VAL-24 size, VAL-25 count, VAL-26 damaged/locked, VAL-27 virus'
+      responses: { '200': { description: '{ items: [{ id, name, mime, sizeBytes, purpose }] }' } }
+  /files/{id}/link:
+    get:
+      summary: 'Short-lived link (CFG-31) bound to the user and session; 404 GEN-11 for a file the user may not see'
+      parameters: [{ name: id, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { description: '{ url, expiresAt, name, mime }' } }
+  /profile:
+    get:
+      summary: 'P-05 profile sections with versions, completion % and missing items (PRF-02), licence warning (PRF-16/17)'
+      responses: { '200': { description: OK } }
+  /profile/sections/{section}:
+    post:
+      summary: 'Save one section (personal | contact | professional | business) with its version; PRF-01, GEN-05, PRF-14'
+      parameters: [{ name: section, in: path, required: true, schema: { type: string } }]
+      responses: { '200': { description: OK }, '409': { description: GEN-05 with changedFields }, '422': { $ref: '#/components/responses/Error' } }
+  /kyc:
+    get: { summary: 'P-06 own KYC (full PAN for the advisor; masked for assistants)', responses: { '200': { description: OK } } }
+    post:
+      summary: 'Submit KYC (PAN, name, two files, declaration, version) → PENDING_REVIEW, PRF-04'
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: OK } }
+  /admin/kyc:
+    get: { summary: 'Review queue, oldest first, with review-by date (CFG-125) — STF, ADM', responses: { '200': { description: OK } } }
+  /admin/kyc/{accountId}:
+    get: { summary: 'One review item with the full PAN and the documents', parameters: [{ name: accountId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/kyc/{accountId}/decision:
+    post:
+      summary: 'VERIFY or REJECT (reason; note for OTHER); second decision → 409 GEN-04; advisor gets PRF-05/06 by bell and email'
+      parameters: [{ name: accountId, in: path, required: true, schema: { type: string } }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      responses: { '200': { description: OK } }
+  /insurance-types: { get: { summary: 'ACTIVE insurance types', responses: { '200': { description: OK } } } }
+  /insurers/available: { get: { summary: 'ACTIVE insurers not yet added (search q)', responses: { '200': { description: OK } } } }
+  /insurers/mine:
+    get: { summary: 'P-07 my insurers with warnings PRF-10 / PRF-11', responses: { '200': { description: OK } } }
+    post: { summary: 'Add insurer + agent code (PRF-08; PRF-09 duplicate)', responses: { '200': { description: OK } } }
+  /insurers/mine/{id}: { post: { summary: 'Edit code / validity / letter (version)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /insurers/mine/{id}/deactivate: { post: { summary: 'ACTIVE → INACTIVE (browser asks PRF-12 first)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /insurers/mine/{id}/activate: { post: { summary: 'INACTIVE → ACTIVE', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /dashboard/banners: { get: { summary: 'SUB-04 trial, SUB-05 grace, SUB-03 read-only', responses: { '200': { description: OK } } } }
+  /dashboard/profile: { get: { summary: 'Profile completion card (null at 100%)', responses: { '200': { description: OK } } } }
+  /dashboard/tasks: { get: { summary: 'OPEN tasks due today or overdue, up to CFG-130 (DSH-04 when empty)', responses: { '200': { description: OK } } } }
+  /dashboard/activity: { get: { summary: 'Last CFG-130 record events in the account', responses: { '200': { description: OK } } } }
+  /notifications:
+    get: { summary: 'P-10 bell list, unread count and badge ("{CFG-149}+")', responses: { '200': { description: OK } } }
+  /notifications/read-all: { post: { summary: 'Mark all as read', responses: { '200': { description: OK } } } }
+  /notifications/{id}/read: { post: { summary: 'Mark one read and return its link', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /tasks:
+    get: { summary: 'P-11 tasks by tab (overdue | today | upcoming | done), paged CFG-23', responses: { '200': { description: OK } } }
+    post: { summary: 'Create (title, dueDate, dueTime, notes); DSH-24 for a past time', responses: { '200': { description: OK } } }
+  /tasks/{id}: { post: { summary: 'Edit with version (GEN-05)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /tasks/{id}/done: { post: { summary: 'OPEN → DONE (DSH-23)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /tasks/{id}/reopen: { post: { summary: 'DONE → OPEN', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /tasks/{id}/cancel: { post: { summary: 'OPEN → CANCELLED', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /assistants:
+    get: { summary: 'P-53 assistants, limit (CFG-158) and whether the plan allows them', responses: { '200': { description: OK } } }
+    post:
+      summary: 'Add (name, mobile) with X-Step-Up-Token for ADD_ASSISTANT; AST-01 / AST-02 / AST-04 / REF-02'
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKeyRequired' }]
+      responses: { '200': { description: OK } }
+  /assistants/{id}/disable: { post: { summary: 'Ends their sessions at once (AST-03)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /assistants/{id}/enable: { post: { summary: 'Reverses disable (plan and limit checked)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } } }
+  /admin/approvals:
+    get: { summary: 'P-25 step 1: every pending item oldest first, with makers and youMadeThis (CAT-05)', responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers:
+    get: { summary: 'P-20 list (q, status)', responses: { '200': { description: OK } } }
+    post: { summary: 'Create (submit:true sends for approval) CAT-01/02; CAT-06, CAT-07, CAT-10', responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}:
+    get: { summary: 'One insurer with pendingChange.changes', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Edit: DRAFT in place; ACTIVE gets a pending change (CAT-08 if one waits)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}/submit:
+    post: { summary: 'DRAFT → PENDING_APPROVAL', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}/approve:
+    post: { summary: 'Different ADM + X-Step-Up-Token (APPROVE); CAT-05, AUTH-26, GEN-04', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}/reject:
+    post: { summary: 'Reason required (CAT-04); values kept', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}/discard-change:
+    post: { summary: 'Drop a rejected pending change', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}/impact:
+    get: { summary: 'CAT-09 impact counts', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}/deactivate:
+    post: { summary: 'ADM: ACTIVE → INACTIVE', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/insurers/{id}/activate:
+    post: { summary: 'ADM: INACTIVE → ACTIVE', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/template-options:
+    get: { summary: 'Feature groups, data types, factor kinds, filled-from lists', responses: { '200': { description: OK } } }
+  /admin/catalogue/types:
+    get: { summary: 'P-21 types with template status', responses: { '200': { description: OK } } }
+    post: { summary: 'New type + first template draft (name, features, factors, questions)', responses: { '200': { description: OK } } }
+  /admin/catalogue/types/{id}:
+    get: { summary: 'Type with active and open template', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Rename (pending change once ACTIVE)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/types/{id}/template:
+    post: { summary: 'Edit template: open draft (copied from ACTIVE)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/types/{id}/change/approve:
+    post: { summary: 'Approve rename (step-up)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/types/{id}/change/reject:
+    post: { summary: 'Reject rename (reason)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/types/{id}/impact:
+    get: { summary: 'CAT-09 style impact', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/types/{id}/deactivate:
+    post: { summary: 'ADM', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/types/{id}/activate:
+    post: { summary: 'ADM', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/templates/{id}:
+    get: { summary: 'Template version (with the active one for comparison)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Save draft (version; GEN-05)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/templates/{id}/submit:
+    post: { summary: 'CAT-12, CAT-30, CAT-16 checks', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/templates/{id}/approve:
+    post: { summary: 'Different ADM + step-up; old version RETIRED', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/templates/{id}/reject:
+    post: { summary: 'Back to DRAFT (reason)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/product-options:
+    get: { summary: 'ACTIVE insurers and types with ACTIVE templates', responses: { '200': { description: OK } } }
+  /admin/catalogue/products:
+    get: { summary: 'P-22 verified products (q, status)', responses: { '200': { description: OK } } }
+    post: { summary: 'New verified product, version 1 DRAFT (CAT-33 without UIN)', responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}:
+    get: { summary: 'Product with version history', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/edit:
+    post: { summary: 'Open a new DRAFT from the published version (CAT-27)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/withdraw:
+    post: { summary: 'ADM, reason (CAT-26)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/make-available:
+    post: { summary: 'ADM', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/product-versions/{id}:
+    get: { summary: 'Version with template, changes against published, missing checks, CAT-28', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Autosave DRAFT (version)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/product-versions/{id}/use-current-template:
+    post: { summary: 'Move the draft onto the ACTIVE template', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/product-versions/{id}/submit:
+    post: { summary: 'CAT-13 list of what is missing', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/product-versions/{id}/approve:
+    post: { summary: 'P-25: different ADM + step-up; CAT-29 if changed', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/product-versions/{id}/reject:
+    post: { summary: 'Reason (CAT-04)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/product-versions/{id}/ocr:
+    post: { summary: 'P-23 Read with OCR (OCR-01, OCR-04, OCR-07); reuses the open job', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/ocr/{id}:
+    get: { summary: 'Review grid (flagged below CFG-37)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/ocr/{id}/decisions:
+    post: { summary: 'ACCEPT | EDIT (value) | IGNORE | NOT_STATED per row', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/ocr/{id}/accept-high:
+    post: { summary: 'Accept all above CFG-37', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/ocr/{id}/apply:
+    post: { summary: 'OCR-05 / OCR-06', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/ocr/{id}/retry:
+    post: { summary: 'Same file, new job', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/prices:
+    get: { summary: 'SkyUp reference prices', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Save SkyUp reference price', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/prices/template.csv:
+    get: { summary: 'Rate-table CSV template', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/prices/check:
+    post: { summary: 'Check rows or csv without saving', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/prices/{priceId}:
+    get: { summary: 'One price with rows', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: priceId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/products/{id}/prices/{priceId}/cancel:
+    post: { summary: 'Cancel SCHEDULED (CAT-25)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: priceId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/corrections:
+    get: { summary: 'P-58 review queue', responses: { '200': { description: OK } } }
+  /admin/catalogue/corrections/{id}/accept:
+    post: { summary: 'Opens/updates a DRAFT version (CAT-39 to advisor)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/catalogue/corrections/{id}/reject:
+    post: { summary: 'Reason (CAT-40 to advisor)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products:
+    get: { summary: 'Verified + own products (q, typeId, insurerId, kind) with quotable flag', responses: { '200': { description: OK } } }
+  /catalogue/options:
+    get: { summary: 'Insurers and types for + My product', responses: { '200': { description: OK } } }
+  /catalogue/products/{id}:
+    get: { summary: 'Detail; features read "Not stated by insurer"; commercials for ADV only', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/my-products:
+    post: { summary: 'ADV: own product, PUBLISHED at once (CAT-13, CAT-33, CAT-07)', responses: { '200': { description: OK } } }
+  /catalogue/my-products/{id}:
+    post: { summary: 'ADV: edit own product (new version)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/my-products/{id}/status:
+    post: { summary: 'ADV: UPCOMING | ACTIVE | WITHDRAWN', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/product-versions/{id}/use-current-template:
+    post: { summary: 'ADV: own product onto current template', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/commercials:
+    post: { summary: 'ADV: commission % and notes (CAT-36), version', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/prices:
+    get: { summary: 'ADV: my price versions', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'ADV: save (CAT-17, CAT-18, CAT-37, CAT-38)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/prices/template.csv:
+    get: { summary: 'ADV: CSV template', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/prices/reference:
+    get: { summary: 'ADV: copy SkyUp reference price', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/prices/check:
+    post: { summary: 'ADV: check rows (CAT-19, CAT-20, CAT-21, CAT-22, CAT-31)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/prices/{priceId}:
+    get: { summary: 'ADV: one of my prices', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: priceId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/prices/{priceId}/cancel:
+    post: { summary: 'ADV: cancel SCHEDULED (CAT-25)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: priceId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/ocr:
+    post: { summary: 'ADV: scan brochure for + My product (typeId, fileId)', responses: { '200': { description: OK } } }
+  /catalogue/ocr/{id}:
+    get: { summary: 'ADV: review grid', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/ocr/{id}/decisions:
+    post: { summary: 'ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/ocr/{id}/accept-high:
+    post: { summary: 'ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/ocr/{id}/apply:
+    post: { summary: 'ADV: returns values to fill the form', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/ocr/{id}/retry:
+    post: { summary: 'ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/correction-fields:
+    get: { summary: 'ADV: fields with current values', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/products/{id}/corrections:
+    post: { summary: 'ADV: suggest (CAT-35; CAT-08 duplicate)', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /catalogue/corrections:
+    get: { summary: 'ADV: my corrections', responses: { '200': { description: OK } } }
+  /admin/accounts:
+    get: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+  /admin/accounts/{id}:
+    get: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/accounts/{id}/close:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/accounts/{id}/offline-payment:
+    post: { summary: 'Phase 6 SkyUp · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/accounts/{id}/reactivate:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/accounts/{id}/suspend:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/accounts/{id}/wallet-credit:
+    post: { summary: 'Phase 6 SkyUp · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/accounts/{id}/whatsapp-number:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/audit:
+    get: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+  /admin/audit/export:
+    post: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+  /admin/config:
+    get: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+  /admin/config-changes/{id}/approve:
+    post: { summary: 'Phase 6 SkyUp · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/config-changes/{id}/reject:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/config/history:
+    get: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+  /admin/config/{id}:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/support/grants:
+    get: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+  /admin/support/{accountId}/customers:
+    get: { summary: 'Phase 6 SkyUp', parameters: [{ name: accountId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/support/{accountId}/customers/{customerId}:
+    get: { summary: 'Phase 6 SkyUp', parameters: [{ name: accountId, in: path, required: true, schema: { type: string } }, { name: customerId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/templates:
+    get: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 6 SkyUp · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /admin/templates/{id}:
+    get: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/templates/{id}/activate:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/templates/{id}/approve:
+    post: { summary: 'Phase 6 SkyUp · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/templates/{id}/deactivate:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/templates/{id}/reject:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/templates/{id}/submit:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /admin/users:
+    get: { summary: 'Phase 6 SkyUp', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 6 SkyUp · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /admin/users/{id}:
+    post: { summary: 'Phase 6 SkyUp', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /best-fit/options:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+  /best-fit/rank:
+    post: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+  /best-fit/{logId}/choose:
+    post: { summary: 'Phase 5', parameters: [{ name: logId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /billing/orders/{id}:
+    get: { summary: 'Phase 6 ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /billing/orders/{id}/test-complete:
+    post: { summary: 'Phase 6 ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /billing/plan:
+    get: { summary: 'Phase 6 ADV', responses: { '200': { description: OK } } }
+  /billing/plan/pay:
+    post: { summary: 'Phase 6 ADV · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /billing/wallet:
+    get: { summary: 'Phase 6 ADV', responses: { '200': { description: OK } } }
+  /billing/wallet/recharge:
+    post: { summary: 'Phase 6 ADV · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /communications:
+    get: { summary: 'Phase 6', responses: { '200': { description: OK } } }
+  /communications/greetings:
+    get: { summary: 'Phase 6', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 6', responses: { '200': { description: OK } } }
+  /communications/greetings/exclusion:
+    post: { summary: 'Phase 6', responses: { '200': { description: OK } } }
+  /communications/templates:
+    get: { summary: 'Phase 6', responses: { '200': { description: OK } } }
+  /communications/{id}/cancel:
+    post: { summary: 'Phase 6', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /communications/{id}/resend:
+    post: { summary: 'Phase 6 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 5 · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /comparisons/{id}:
+    get: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/cancel:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/choose:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/create-quotation:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/delete:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/draft:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/edit:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/generate:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /comparisons/{id}/share:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 4 · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /customers/check-duplicate:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+  /customers/options:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+  /customers/{id}:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/activity:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/consent:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/consent/history:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/consent/record:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/consent/withdraw:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/cover-map:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/deactivate:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/default-nominee:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/documents:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/family:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/family/{memberId}:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: memberId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/family/{memberId}/activate:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: memberId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/family/{memberId}/deactivate:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: memberId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/identity:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/links:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/reactivate:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/reveal:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/vehicles:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/vehicles/{vehicleId}/files:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: vehicleId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /customers/{id}/vehicles/{vehicleId}/sold:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }, { name: vehicleId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /documents:
+    post: { summary: 'Phase 4 · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /documents/customers:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+  /documents/options:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+  /documents/versions/{id}:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /documents/versions/{id}/confirm:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /documents/{*any}:
+    delete: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+  /documents/{id}/label:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /leads:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 4 · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /leads/board/{pipelineId}:
+    get: { summary: 'Phase 4', parameters: [{ name: pipelineId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /leads/check-duplicate:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+  /leads/options:
+    get: { summary: 'Phase 4', responses: { '200': { description: OK } } }
+  /leads/{id}:
+    get: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /leads/{id}/contact:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /leads/{id}/convert:
+    post: { summary: 'Phase 4 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /leads/{id}/status:
+    post: { summary: 'Phase 4', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /me/activity-log:
+    get: { summary: 'Phase 6 ADV', responses: { '200': { description: OK } } }
+  /me/activity-log/export:
+    post: { summary: 'Phase 6 ADV', responses: { '200': { description: OK } } }
+  /me/exports:
+    get: { summary: 'Phase 6 ADV', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 6 ADV · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /me/exports/{id}/download:
+    get: { summary: 'Phase 6 ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /me/support-grants:
+    get: { summary: 'Phase 6 ADV', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 6 ADV · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /me/support-grants/{id}/end:
+    post: { summary: 'Phase 6 ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /payments/{id}/expire:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /payments/{id}/fail:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /payments/{id}/replace:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /payments/{id}/undo:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /policies:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+  /policies/existing:
+    post: { summary: 'Phase 5 · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /policies/insurers:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+  /policies/options:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+  /policies/{id}:
+    get: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /policies/{id}/cancel:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /policies/{id}/correct:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /policies/{id}/issue:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /policies/{id}/nominees:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /policies/{id}/nominees/check:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /proposals:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+  /proposals/{id}:
+    get: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /proposals/{id}/cancel:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /proposals/{id}/decline:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /proposals/{id}/draft:
+    post: { summary: 'Phase 5', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /proposals/{id}/submit:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /public/comparisons/{token}:
+    get: { summary: 'Public links', parameters: [{ name: token, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /public/logo/{accountId}:
+    get: { summary: 'Public links', parameters: [{ name: accountId, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /public/quotations/{token}:
+    get: { summary: 'Public links', parameters: [{ name: token, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /public/referral/{code}:
+    get: { summary: 'Public links', parameters: [{ name: code, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+    post: { summary: 'Public links', parameters: [{ name: code, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /public/unsubscribe:
+    post: { summary: 'Public links', responses: { '200': { description: OK } } }
+  /quotations:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 5 · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /quotations/options:
+    get: { summary: 'Phase 5', responses: { '200': { description: OK } } }
+  /quotations/q/{qid}:
+    get: { summary: 'Phase 5', parameters: [{ name: qid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}:
+    get: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/accept:
+    post: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/cancel:
+    post: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/delete:
+    post: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/draft:
+    post: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/edit:
+    post: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/generate:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/payment:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/payment-link:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/proposal:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/reject:
+    post: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/revise:
+    post: { summary: 'Phase 5', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /quotations/revisions/{rid}/share:
+    post: { summary: 'Phase 5 · Idempotency-Key required', parameters: [{ name: rid, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /referral/dashboard:
+    get: { summary: 'Phase 6 REF', responses: { '200': { description: OK } } }
+  /referrers:
+    get: { summary: 'Phase 6 ADV', responses: { '200': { description: OK } } }
+    post: { summary: 'Phase 6 ADV · Idempotency-Key required', responses: { '200': { description: OK } } }
+  /referrers/{id}/disable:
+    post: { summary: 'Phase 6 ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /referrers/{id}/enable:
+    post: { summary: 'Phase 6 ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /referrers/{id}/new-link:
+    post: { summary: 'Phase 6 ADV', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals:
+    get: { summary: 'Phase 6', responses: { '200': { description: OK } } }
+  /renewals/{id}:
+    get: { summary: 'Phase 6', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals/{id}/contact:
+    post: { summary: 'Phase 6', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals/{id}/not-renewing:
+    post: { summary: 'Phase 6', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals/{id}/pause:
+    post: { summary: 'Phase 6', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals/{id}/premium:
+    post: { summary: 'Phase 6 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals/{id}/quotation:
+    post: { summary: 'Phase 6 · Idempotency-Key required', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals/{id}/reopen:
+    post: { summary: 'Phase 6', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /renewals/{id}/resume:
+    post: { summary: 'Phase 6', parameters: [{ name: id, in: path, required: true, schema: { type: string } }], responses: { '200': { description: OK } } }
+  /webhooks/email:
+    post: { summary: 'Webhooks (HMAC-SHA256 of raw body in x-signature)', responses: { '200': { description: OK } } }
+  /webhooks/payments:
+    post: { summary: 'Webhooks (HMAC-SHA256 of raw body in x-signature)', responses: { '200': { description: OK } } }
+  /webhooks/whatsapp:
+    post: { summary: 'Webhooks (HMAC-SHA256 of raw body in x-signature)', responses: { '200': { description: OK } } }

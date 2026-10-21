@@ -1,0 +1,2002 @@
+{
+ "GEN-01": {
+  "text": "{Field label} is required.",
+  "used": "All forms",
+  "retired": false
+ },
+ "GEN-02": {
+  "text": "Please correct the {count} highlighted fields.",
+  "used": "All forms",
+  "retired": false
+ },
+ "GEN-03": {
+  "text": "You do not have permission to do this.",
+  "used": "GR-18",
+  "retired": false
+ },
+ "GEN-04": {
+  "text": "This action is not allowed because this {record type} is {current status}.",
+  "used": "GR-19, GR-21",
+  "retired": false
+ },
+ "GEN-05": {
+  "text": "Someone changed this {record type} while you were editing. Your changes are not saved yet. Reload the latest version and apply your changes again.",
+  "used": "GR-11",
+  "retired": false
+ },
+ "GEN-06": {
+  "text": "This was already submitted. Showing the saved result.",
+  "used": "GR-10",
+  "retired": false
+ },
+ "GEN-07": {
+  "text": "Could not reach Bimayantra. Your entries are kept. Check your internet connection and select Retry.",
+  "used": "GR-17",
+  "retired": false
+ },
+ "GEN-08": {
+  "text": "{Record type} saved.",
+  "used": "All forms",
+  "retired": false
+ },
+ "GEN-09": {
+  "text": "Your session has ended for security. Verify your mobile number to continue. Your entries are kept.",
+  "used": "GR-16, P-03",
+  "retired": false
+ },
+ "GEN-10": {
+  "text": "You have unsaved changes. Leave this page and lose them?",
+  "used": "GR-13",
+  "retired": false
+ },
+ "GEN-11": {
+  "text": "This record does not exist or you do not have access to it.",
+  "used": "GR-18",
+  "retired": false
+ },
+ "GEN-12": {
+  "text": "This is taking longer than usual and may still complete. Select Check status before trying again.",
+  "used": "GR-09, GR-17",
+  "retired": false
+ },
+ "GEN-13": {
+  "text": "Still working…",
+  "used": "GR-09",
+  "retired": false
+ },
+ "GEN-14": {
+  "text": "Saved as draft. You can continue later from the dashboard.",
+  "used": "GR-15",
+  "retired": false
+ },
+ "GEN-15": {
+  "text": "Too many attempts. Please wait {seconds} seconds and try again.",
+  "used": "Rate limits",
+  "retired": false
+ },
+ "GEN-16": {
+  "text": "Copied.",
+  "used": "Copy actions",
+  "retired": false
+ },
+ "GEN-17": {
+  "text": "This {record type} was changed or removed by someone else. Showing the latest version.",
+  "used": "Lists, details",
+  "retired": false
+ },
+ "GEN-18": {
+  "text": "You are offline. Changes cannot be saved until you reconnect.",
+  "used": "GR-17",
+  "retired": false
+ },
+ "GEN-19": {
+  "text": "Bimayantra is being updated. Please try again after {time} IST.",
+  "used": "NFR-03",
+  "retired": false
+ },
+ "GEN-20": {
+  "text": "Check status: your request completed. Showing the saved result.",
+  "used": "GR-17",
+  "retired": false
+ },
+ "GEN-21": {
+  "text": "Check status: your request did not complete. You can safely try again.",
+  "used": "GR-17",
+  "retired": false
+ },
+ "GEN-99": {
+  "text": "Something unexpected happened. Please try again. If it happens again, share this reference with support: {errorId}.",
+  "used": "Unknown errors only",
+  "retired": false
+ },
+ "VAL-01": {
+  "text": "Enter a 10-digit Indian mobile number starting with 6, 7, 8 or 9.",
+  "used": "FLD-01",
+  "retired": false
+ },
+ "VAL-02": {
+  "text": "Enter a name of {CFG-11} to {CFG-12} characters using letters, spaces, dot (.), apostrophe (') or hyphen (-).",
+  "used": "FLD-02",
+  "retired": false
+ },
+ "VAL-03": {
+  "text": "Enter a valid email address, for example name@example.com.",
+  "used": "FLD-03",
+  "retired": false
+ },
+ "VAL-04": {
+  "text": "Enter a valid date in DD-MM- YYYY format.",
+  "used": "FLD-04",
+  "retired": false
+ },
+ "VAL-05": {
+  "text": "Date of birth cannot be in the future.",
+  "used": "FLD-05",
+  "retired": false
+ },
+ "VAL-06": {
+  "text": "Enter a date of birth within the last {CFG-14} years.",
+  "used": "FLD-05",
+  "retired": false
+ },
+ "VAL-07": {
+  "text": "Choose today or a later date.",
+  "used": "FLD-06",
+  "retired": false
+ },
+ "VAL-08": {
+  "text": "End date must be on or after the start date.",
+  "used": "FLD-07",
+  "retired": false
+ },
+ "VAL-09": {
+  "text": "Enter an amount in rupees with up to 2 decimal places, for example 12,500.00.",
+  "used": "FLD-08",
+  "retired": false
+ },
+ "VAL-10": {
+  "text": "Amount must be between ₹{min} and ₹{max}.",
+  "used": "FLD-08",
+  "retired": false
+ },
+ "VAL-11": {
+  "text": "Enter a percentage from 0 to 100 with up to 2 decimal places.",
+  "used": "FLD-09",
+  "retired": false
+ },
+ "VAL-12": {
+  "text": "Enter a whole number from {min} to {max}.",
+  "used": "FLD-10",
+  "retired": false
+ },
+ "VAL-13": {
+  "text": "Enter an address of 3 to {CFG-15} characters.",
+  "used": "FLD-11",
+  "retired": false
+ },
+ "VAL-14": {
+  "text": "Enter a city or town name of 2 to {CFG-104} letters.",
+  "used": "FLD-12",
+  "retired": false
+ },
+ "VAL-15": {
+  "text": "Enter a 6-digit PIN code that does not start with 0.",
+  "used": "FLD-14",
+  "retired": false
+ },
+ "VAL-16": {
+  "text": "Enter a valid PAN of an individual, for example ABCPE1234F.",
+  "used": "FLD-15",
+  "retired": false
+ },
+ "VAL-17": {
+  "text": "Enter the number exactly as shown on your IRDAI licence or POSP certificate ({CFG-105} letters, digits, - or /).",
+  "used": "FLD-16",
+  "retired": false
+ },
+ "VAL-18": {
+  "text": "Enter the agent code given by this insurer ({CFG-106} letters, digits, - or /).",
+  "used": "FLD-17",
+  "retired": false
+ },
+ "VAL-19": {
+  "text": "Enter the {CFG-01}-digit code sent to your mobile.",
+  "used": "FLD-18",
+  "retired": false
+ },
+ "VAL-20": {
+  "text": "Enter the policy number exactly as printed on the policy ({CFG-107} letters, digits, - or /).",
+  "used": "FLD-19",
+  "retired": false
+ },
+ "VAL-21": {
+  "text": "Notes can have up to {CFG-13} characters.",
+  "used": "FLD-21",
+  "retired": false
+ },
+ "VAL-22": {
+  "text": "Choose an option from the list.",
+  "used": "FLD-13, FLD-20",
+  "retired": false
+ },
+ "VAL-23": {
+  "text": "This file type is not allowed. Upload one of: {allowed types}.",
+  "used": "FLD-22",
+  "retired": false
+ },
+ "VAL-24": {
+  "text": "This file is larger than {size limit} MB. Upload a smaller file.",
+  "used": "FLD-22",
+  "retired": false
+ },
+ "VAL-25": {
+  "text": "You can upload up to {CFG-28} files at a time.",
+  "used": "FLD-22",
+  "retired": false
+ },
+ "VAL-26": {
+  "text": "This file could not be opened. It may be damaged or password-protected.",
+  "used": "FLD-22",
+  "retired": false
+ },
+ "VAL-27": {
+  "text": "This file did not pass the security check and was not uploaded.",
+  "used": "FLD-22",
+  "retired": false
+ },
+ "VAL-28": {
+  "text": "Enter a full web address starting with https://.",
+  "used": "FLD-23",
+  "retired": false
+ },
+ "VAL-29": {
+  "text": "Tick this box to continue.",
+  "used": "FLD-24",
+  "retired": false
+ },
+ "VAL-30": {
+  "text": "Enter the transaction or receipt number from the insurer ({CFG-108} letters, digits, - or /).",
+  "used": "FLD-25",
+  "retired": false
+ },
+ "VAL-31": {
+  "text": "Enter the {CFG-73}-character referral code.",
+  "used": "FLD-26",
+  "retired": false
+ },
+ "VAL-32": {
+  "text": "Enter a valid time, for example 10:30 AM.",
+  "used": "FLD-27",
+  "retired": false
+ },
+ "VAL-33": {
+  "text": "Enter a code of {CFG-111} capital letters, digits or hyphens.",
+  "used": "FLD-28",
+  "retired": false
+ },
+ "VAL-34": {
+  "text": "Enter {CFG-109} characters.",
+  "used": "FLD-29",
+  "retired": false
+ },
+ "VAL-35": {
+  "text": "This date cannot be in the future.",
+  "used": "FLD-32",
+  "retired": false
+ },
+ "VAL-36": {
+  "text": "Enter a valid Indian phone number, for example 1800 123 4567 or 080 2345 6789.",
+  "used": "FLD-30",
+  "retired": false
+ },
+ "VAL-37": {
+  "text": "Enter the IRDAI product UIN exactly as printed on the brochure.",
+  "used": "FLD-31",
+  "retired": false
+ },
+ "VAL-38": {
+  "text": "Enter a valid 12-digit Aadhaar number.",
+  "used": "FLD-33",
+  "retired": false
+ },
+ "VAL-39": {
+  "text": "Enter a valid 15-character GSTIN, for example 29ABCDE1234F1Z5, or leave it blank.",
+  "used": "FLD-34",
+  "retired": false
+ },
+ "VAL-40": {
+  "text": "Enter the registration number as on the RC, for example KA01AB1234.",
+  "used": "FLD-35",
+  "retired": false
+ },
+ "VAL-41": {
+  "text": "Enter the 6-digit cheque number.",
+  "used": "FLD-36",
+  "retired": false
+ },
+ "VAL-42": {
+  "text": "Enter a label of {CFG-172} characters.",
+  "used": "FLD-37",
+  "retired": false
+ },
+ "AUTH-01": {
+  "text": "We sent a {CFG-01}-digit code to {masked mobile}. It is valid for {CFG-02} minutes.",
+  "used": "P-01, P-02, P-04",
+  "retired": false
+ },
+ "AUTH-02": {
+  "text": "The code is incorrect. You have {n} tries left.",
+  "used": "OTP",
+  "retired": false
+ },
+ "AUTH-03": {
+  "text": "This code has expired. Select Resend OTP to get a new code.",
+  "used": "OTP",
+  "retired": false
+ },
+ "AUTH-04": {
+  "text": "Too many wrong tries. For your security, try again after {time} IST.",
+  "used": "OTP",
+  "retired": false
+ },
+ "AUTH-05": {
+  "text": "You can request a new code in {seconds} seconds.",
+  "used": "OTP",
+  "retired": false
+ },
+ "AUTH-06": {
+  "text": "Too many codes were requested for this number. Try again after {time} IST.",
+  "used": "OTP",
+  "retired": false
+ },
+ "AUTH-07": {
+  "text": "You already have an advisor account with this number. You are now logged in.",
+  "used": "P-01",
+  "retired": false
+ },
+ "AUTH-08": {
+  "text": "This number is already used for a different Bimayantra access. Use another mobile number to register as an advisor.",
+  "used": "P-01",
+  "retired": false
+ },
+ "AUTH-09": {
+  "text": "No account uses this number. Check the number, or register as a new advisor.",
+  "used": "P-02",
+  "retired": false
+ },
+ "AUTH-10": {
+  "text": "Your account is suspended. Contact Bimayantra support at {support email}.",
+  "used": "P-02, P-51",
+  "retired": false
+ },
+ "AUTH-11": {
+  "text": "Your access has been switched off. Contact the advisor who invited you.",
+  "used": "P-02",
+  "retired": false
+ },
+ "AUTH-12": {
+  "text": "Welcome, {name}. Your access is ready.",
+  "used": "P-02",
+  "retired": false
+ },
+ "AUTH-13": {
+  "text": "We could not send the OTP right now. Please try again in a minute.",
+  "used": "OTP",
+  "retired": false
+ },
+ "AUTH-14": {
+  "text": "This account was closed on {date}. Contact Bimayantra support at {support email}.",
+  "used": "P-02",
+  "retired": false
+ },
+ "AUTH-15": {
+  "text": "Welcome to Bimayantra, {name}. Your {CFG-78}-day free trial has started.",
+  "used": "P-01",
+  "retired": false
+ },
+ "AUTH-16": {
+  "text": "You have logged out.",
+  "used": "P-03",
+  "retired": false
+ },
+ "AUTH-17": {
+  "text": "You were logged out because your account was signed in on another device.",
+  "used": "P-03",
+  "retired": false
+ },
+ "AUTH-18": {
+  "text": "Your session ended after {CFG-07} minutes without activity. Please log in again.",
+  "used": "P-03",
+  "retired": false
+ },
+ "AUTH-19": {
+  "text": "Your SkyUp access has been switched off. Contact a SkyUp Admin.",
+  "used": "P-02",
+  "retired": false
+ },
+ "AUTH-20": {
+  "text": "Your invitation has expired. Ask the advisor to invite you again.",
+  "used": "P-02",
+  "retired": false
+ },
+ "AUTH-21": {
+  "text": "You will be logged out in {CFG-123} minutes because of no activity.",
+  "used": "P-03",
+  "retired": false
+ },
+ "AUTH-22": {
+  "text": "The session on {device} has ended.",
+  "used": "P-03",
+  "retired": false
+ },
+ "AUTH-23": {
+  "text": "Your mobile number is now {masked new number}. Use it from your next login.",
+  "used": "P-04",
+  "retired": false
+ },
+ "AUTH-24": {
+  "text": "This is already your registered number.",
+  "used": "P-04",
+  "retired": false
+ },
+ "AUTH-25": {
+  "text": "This number is already in use. Enter a different number.",
+  "used": "P-04",
+  "retired": false
+ },
+ "AUTH-26": {
+  "text": "Confirm it is you: enter the OTP sent to {masked mobile}.",
+  "used": "Step-up (CFG-83), P-52",
+  "retired": false
+ },
+ "PRF-01": {
+  "text": "Profile saved. Your profile is {percent}% complete.",
+  "used": "P-05",
+  "retired": false
+ },
+ "PRF-02": {
+  "text": "Your profile is {percent}% complete. Add {missing items} to finish.",
+  "used": "P-05, P-08",
+  "retired": false
+ },
+ "PRF-03": {
+  "text": "To share quotations, first add: {missing items}.",
+  "used": "P-05, P-28",
+  "retired": false
+ },
+ "PRF-04": {
+  "text": "KYC submitted for review. We aim to review it within {CFG-125} working days.",
+  "used": "P-06",
+  "retired": false
+ },
+ "PRF-05": {
+  "text": "Your KYC has been verified.",
+  "used": "P-06, P-10",
+  "retired": false
+ },
+ "PRF-06": {
+  "text": "Your KYC was not accepted: {reason}. Please correct it and submit again.",
+  "used": "P-06, P-10",
+  "retired": false
+ },
+ "PRF-07": {
+  "text": "Changing this will send your KYC for review again. Continue?",
+  "used": "P-06",
+  "retired": false
+ },
+ "PRF-08": {
+  "text": "{Insurer} added with agent code {code}.",
+  "used": "P-07",
+  "retired": false
+ },
+ "PRF-09": {
+  "text": "You have already added {insurer}. Edit the existing entry instead.",
+  "used": "P-07",
+  "retired": false
+ },
+ "PRF-10": {
+  "text": "{Insurer} is no longer available in Bimayantra. You cannot create new quotations for it.",
+  "used": "P-07, P-10",
+  "retired": false
+ },
+ "PRF-11": {
+  "text": "Your agent code for {insurer} expired on {date}. Update it to create new quotations.",
+  "used": "P-07, P-27",
+  "retired": false
+ },
+ "PRF-12": {
+  "text": "You will not be able to create new quotations for {insurer}. Existing quotations and policies are not affected. Continue?",
+  "used": "P-07",
+  "retired": false
+ },
+ "PRF-13": {
+  "text": "Your licence validity date has passed. Update your licence details to keep sharing quotations.",
+  "used": "P-05, P-28",
+  "retired": false
+ },
+ "PRF-14": {
+  "text": "You must be {CFG-128} or older to use Bimayantra as an advisor.",
+  "used": "P-05",
+  "retired": false
+ },
+ "PRF-16": {
+  "text": "Your IRDAI licence expires on {date}. Renew it and update your profile to keep creating quotations.",
+  "used": "P-05",
+  "retired": false
+ },
+ "PRF-17": {
+  "text": "Your IRDAI licence expired on {date}. You cannot create new quotations until you update your licence details.",
+  "used": "P-05, P-27",
+  "retired": false
+ },
+ "PRF-18": {
+  "text": "{Insurance type} is not in your authorised categories. Add it in your profile if your licence allows it.",
+  "used": "P-05, P-27",
+  "retired": false
+ },
+ "DSH-01": {
+  "text": "Could not load this section. Select Retry.",
+  "used": "P-08, P-10, P-15",
+  "retired": false
+ },
+ "DSH-02": {
+  "text": "Type at least {CFG-24} characters to search.",
+  "used": "P-09",
+  "retired": false
+ },
+ "DSH-03": {
+  "text": "No matches for \"{text}\".",
+  "used": "P-09",
+  "retired": false
+ },
+ "DSH-04": {
+  "text": "Nothing to show yet. Add your first lead to get started.",
+  "used": "P-08",
+  "retired": false
+ },
+ "DSH-10": {
+  "text": "Your profile is {percent}% complete.",
+  "used": "P-10",
+  "retired": false
+ },
+ "DSH-11": {
+  "text": "Follow-up with {name} is due at {time}.",
+  "used": "P-10, P-11",
+  "retired": false
+ },
+ "DSH-12": {
+  "text": "Update the payment status for {quotation number} ({customer}).",
+  "used": "P-10, P-32",
+  "retired": false
+ },
+ "DSH-13": {
+  "text": "Record the policy issued for {customer} ({product}).",
+  "used": "P-10, P-33",
+  "retired": false
+ },
+ "DSH-14": {
+  "text": "{Customer}'s {product} policy expires on {date}.",
+  "used": "P-10, P-37",
+  "retired": false
+ },
+ "DSH-15": {
+  "text": "{Quotation number} for {customer} has expired.",
+  "used": "P-10, P-29",
+  "retired": false
+ },
+ "DSH-16": {
+  "text": "New referral from {referrer}: {prospect name}.",
+  "used": "P-10, P-46",
+  "retired": false
+ },
+ "DSH-17": {
+  "text": "{n} automated messages could not be sent today. Review them in Communications.",
+  "used": "P-10, P-37, P-41",
+  "retired": false
+ },
+ "DSH-18": {
+  "text": "Your {plan} plan ends on {date}. Renew to keep full access.",
+  "used": "P-10, P-47",
+  "retired": false
+ },
+ "DSH-19": {
+  "text": "{Product} has a new price from {date}. Open quotations keep their price; revise them to use the new price.",
+  "used": "P-10, P-24",
+  "retired": false
+ },
+ "DSH-20": {
+  "text": "{Item type} \"{name}\" is waiting for your approval.",
+  "used": "P-10, P-47",
+  "retired": false
+ },
+ "DSH-21": {
+  "text": "KYC from {advisor name} is waiting for review.",
+  "used": "P-10, P-06",
+  "retired": false
+ },
+ "DSH-22": {
+  "text": "Your change to {item} was {approved or rejected}. {reason}",
+  "used": "P-10",
+  "retired": false
+ },
+ "DSH-23": {
+  "text": "Task marked as done.",
+  "used": "P-11",
+  "retired": false
+ },
+ "DSH-24": {
+  "text": "Choose a time later than now.",
+  "used": "P-11, P-12, P-13",
+  "retired": false
+ },
+ "DSH-25": {
+  "text": "{Customer}'s {product} policy lapsed on {date}.",
+  "used": "P-37",
+  "retired": false
+ },
+ "LD-01": {
+  "text": "Lead {lead number} created.",
+  "used": "P-12",
+  "retired": false
+ },
+ "LD-02": {
+  "text": "An open lead with this name and mobile already exists: {lead number}. Open it instead.",
+  "used": "P-12",
+  "retired": false
+ },
+ "LD-03": {
+  "text": "Another open lead uses this mobile: {name} ({lead number}). Save anyway if this is a different person.",
+  "used": "P-12",
+  "retired": false
+ },
+ "LD-04": {
+  "text": "{Name} is already your customer ({customer number}). Open the customer, or save the lead anyway.",
+  "used": "P-12",
+  "retired": false
+ },
+ "LD-05": {
+  "text": "Lead moved to {status}.",
+  "used": "P-13",
+  "retired": false
+ },
+ "LD-06": {
+  "text": "Choose a reason for marking this lead as lost.",
+  "used": "P-13",
+  "retired": false
+ },
+ "LD-07": {
+  "text": "Lead reopened.",
+  "used": "P-13",
+  "retired": false
+ },
+ "LD-08": {
+  "text": "This lead has been converted. Open customer {customer number} instead.",
+  "used": "P-13",
+  "retired": false
+ },
+ "LD-09": {
+  "text": "Alternate mobile must be different from the primary mobile.",
+  "used": "P-12, P-15",
+  "retired": false
+ },
+ "LD-10": {
+  "text": "Customer {customer number} created from lead {lead number}.",
+  "used": "P-14",
+  "retired": false
+ },
+ "LD-11": {
+  "text": "Lead {lead number} linked to existing customer {customer number}.",
+  "used": "P-14",
+  "retired": false
+ },
+ "CU-01": {
+  "text": "Customer {customer number} created.",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-02": {
+  "text": "A customer with this name and mobile already exists: {customer number}. Open it instead.",
+  "used": "P-15, P-14",
+  "retired": false
+ },
+ "CU-03": {
+  "text": "Another customer uses this mobile: {name} ({customer number}). Save anyway if this is a different person.",
+  "used": "P-15, P-14",
+  "retired": false
+ },
+ "CU-05": {
+  "text": "{Name} added to {customer}'s family.",
+  "used": "P-16",
+  "retired": false
+ },
+ "CU-06": {
+  "text": "A customer can have up to {CFG-35} family members.",
+  "used": "P-16",
+  "retired": false
+ },
+ "CU-07": {
+  "text": "{Name} ({relationship}) is already in this family.",
+  "used": "P-16",
+  "retired": false
+ },
+ "CU-08": {
+  "text": "Cancel these open items before deactivating: {list}.",
+  "used": "P-19",
+  "retired": false
+ },
+ "CU-09": {
+  "text": "{Customer} is now inactive. Automated messages to this customer and family have stopped.",
+  "used": "P-19",
+  "retired": false
+ },
+ "CU-10": {
+  "text": "{Customer} is active again.",
+  "used": "P-19",
+  "retired": false
+ },
+ "CU-11": {
+  "text": "{Channel} consent recorded for {name}.",
+  "used": "P-17",
+  "retired": false
+ },
+ "CU-12": {
+  "text": "{Channel} consent withdrawn for {name}. No more automated {channel} messages will be sent.",
+  "used": "P-17",
+  "retired": false
+ },
+ "CU-13": {
+  "text": "Add a mobile number for {name} before recording {channel} consent.",
+  "used": "P-17",
+  "retired": false
+ },
+ "CU-14": {
+  "text": "Add an email address for {name} before recording email consent.",
+  "used": "P-17",
+  "retired": false
+ },
+ "CU-15": {
+  "text": "Retired in v3.1 (replaced by DOC-03).",
+  "used": "P-18",
+  "retired": true
+ },
+ "DOC-03": {
+  "text": "{Document type} saved as version {n}.",
+  "used": "P-18",
+  "retired": false
+ },
+ "CU-16": {
+  "text": "Retired in v3.1 (documents are never removed).",
+  "used": "P-18",
+  "retired": true
+ },
+ "CU-17": {
+  "text": "Upload only a masked Aadhaar copy, with the first 8 digits hidden. Do not upload full Aadhaar numbers.",
+  "used": "P-18",
+  "retired": false
+ },
+ "CU-18": {
+  "text": "Retired in v3.1 (documents cannot be deleted, DOC-07).",
+  "used": "P-18",
+  "retired": true
+ },
+ "CU-19": {
+  "text": "{Name} is now inactive. Greetings for them have stopped.",
+  "used": "P-16",
+  "retired": false
+ },
+ "CU-20": {
+  "text": "{Customer} is inactive. Reactivate the customer to do this.",
+  "used": "P-15, P-16, P-27, P-28",
+  "retired": false
+ },
+ "CU-21": {
+  "text": "Consent for WhatsApp and SMS belongs to a mobile number. Changing the number removes that consent. Continue?",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-22": {
+  "text": "Email consent belongs to an email address. Changing the email removes that consent. Continue?",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-23": {
+  "text": "Record {customer}'s consent to store personal data before adding PAN or Aadhaar.",
+  "used": "P-15, P-18",
+  "retired": false
+ },
+ "CU-25": {
+  "text": "Showing the full number for {CFG-176} seconds. This view is recorded.",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-26": {
+  "text": "{Name} is already linked as {relation}.",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-27": {
+  "text": "{Name} linked as {relation}.",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-28": {
+  "text": "Default nominee saved. It will be suggested on new proposals.",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-29": {
+  "text": "Another customer ({customer number}) has this PAN. Check the number.",
+  "used": "P-15",
+  "retired": false
+ },
+ "CU-30": {
+  "text": "{Customer} has withdrawn consent to store personal data. New identity details and documents cannot be added.",
+  "used": "P-17",
+  "retired": false
+ },
+ "DOC-01": {
+  "text": "Choose the customer, person and document type first.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-02": {
+  "text": "Enter a name for this document.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-04": {
+  "text": "Check the details read from the document and correct anything wrong, then select Confirm.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-05": {
+  "text": "Label changed. The original upload name is kept in the history.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-06": {
+  "text": "Another document of this customer already has this label.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-07": {
+  "text": "Documents cannot be deleted. You can change the label or upload a newer version.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-08": {
+  "text": "Missing for {customer}: {list}.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-09": {
+  "text": "Camera access is blocked. Allow it in your browser settings, or choose a file instead.",
+  "used": "P-18",
+  "retired": false
+ },
+ "DOC-10": {
+  "text": "We could not read this document. Type the details yourself, then select Confirm.",
+  "used": "P-18",
+  "retired": false
+ },
+ "VEH-01": {
+  "text": "Vehicle {registration} added for {customer}.",
+  "used": "P-54",
+  "retired": false
+ },
+ "VEH-02": {
+  "text": "Add at least {CFG-154} photos before saving.",
+  "used": "P-54",
+  "retired": false
+ },
+ "VEH-03": {
+  "text": "Vehicle {registration} is already recorded for {customer}.",
+  "used": "P-54",
+  "retired": false
+ },
+ "VEH-04": {
+  "text": "A client can have up to {CFG-156} vehicles.",
+  "used": "P-54",
+  "retired": false
+ },
+ "CAT-01": {
+  "text": "{Item} saved as draft.",
+  "used": "Section 9",
+  "retired": false
+ },
+ "CAT-02": {
+  "text": "{Item} sent for approval.",
+  "used": "Section 9",
+  "retired": false
+ },
+ "CAT-03": {
+  "text": "{Item} approved.",
+  "used": "Section 9",
+  "retired": false
+ },
+ "CAT-04": {
+  "text": "{Item} rejected. Reason: {reason}",
+  "used": "Section 9",
+  "retired": false
+ },
+ "CAT-05": {
+  "text": "You made this change, so another admin must approve it.",
+  "used": "Section 9, P-39, P-49",
+  "retired": false
+ },
+ "CAT-06": {
+  "text": "An insurer with this name already exists.",
+  "used": "P-20",
+  "retired": false
+ },
+ "CAT-07": {
+  "text": "This code is already used. Enter a different code.",
+  "used": "P-20, P-22",
+  "retired": false
+ },
+ "CAT-08": {
+  "text": "This item already has a change waiting for approval. Approve or reject that change first.",
+  "used": "P-20, P-49",
+  "retired": false
+ },
+ "CAT-09": {
+  "text": "Deactivating {name} hides {n} products from new quotations and affects {m} advisors. Existing quotations and policies do not change. Continue?",
+  "used": "P-20, P-21",
+  "retired": false
+ },
+ "CAT-10": {
+  "text": "Enter a domain such as insurer.com, without https:// or any path.",
+  "used": "P-20",
+  "retired": false
+ },
+ "CAT-12": {
+  "text": "A feature template needs at least one feature.",
+  "used": "P-21",
+  "retired": false
+ },
+ "CAT-13": {
+  "text": "This product cannot be saved yet: {list}.",
+  "used": "P-22",
+  "retired": false
+ },
+ "CAT-15": {
+  "text": "A product can have up to {CFG-40} add-ons.",
+  "used": "P-22",
+  "retired": false
+ },
+ "CAT-16": {
+  "text": "Minimum must not be more than maximum.",
+  "used": "P-21, P-22",
+  "retired": false
+ },
+ "CAT-17": {
+  "text": "This price version overlaps {version} ({dates}). Choose a different start date.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-18": {
+  "text": "The start date cannot be before today.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-19": {
+  "text": "{n} rows have errors. Download the error report, correct them and upload again.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-20": {
+  "text": "A rate table can have up to {CFG-39} rows.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-21": {
+  "text": "These combinations have no premium and cannot be quoted: {list}. You can still submit.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-22": {
+  "text": "Rows {list} repeat the same factors with different premiums.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-24": {
+  "text": "Retired in v3.1 (price versions need no approval; see CAT-37).",
+  "used": "P-24",
+  "retired": true
+ },
+ "CAT-25": {
+  "text": "Price version {name} cancelled.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-26": {
+  "text": "{Product} is withdrawn. Advisors can no longer quote it.",
+  "used": "P-25",
+  "retired": false
+ },
+ "CAT-27": {
+  "text": "Editing creates a new draft version. The published version stays live until the new one is approved.",
+  "used": "P-22",
+  "retired": false
+ },
+ "CAT-28": {
+  "text": "This product uses an older feature template. Update it to the current template before its next publish.",
+  "used": "P-21",
+  "retired": false
+ },
+ "CAT-29": {
+  "text": "This version has changed since you opened it. Reload to review the latest changes.",
+  "used": "P-25",
+  "retired": false
+ },
+ "CAT-30": {
+  "text": "A feature template needs at least one rating factor. Use \"Manual entry\" pricing for products priced only on the insurer portal.",
+  "used": "P-21",
+  "retired": false
+ },
+ "CAT-31": {
+  "text": "Upload the CSV template for this product without changing its column names.",
+  "used": "P-24",
+  "retired": false
+ },
+ "OCR-01": {
+  "text": "Reading the brochure. This can take up to {CFG-38} minutes. You can leave this page; we will notify you when it is ready.",
+  "used": "P-23",
+  "retired": false
+ },
+ "OCR-02": {
+  "text": "Brochure read. {n} values found; {m} need checking.",
+  "used": "P-23",
+  "retired": false
+ },
+ "OCR-03": {
+  "text": "We could not read this brochure. Enter the values by hand, or try again.",
+  "used": "P-23",
+  "retired": false
+ },
+ "OCR-04": {
+  "text": "This brochure has more than {CFG-30} pages. Upload only the pages that describe the product.",
+  "used": "P-23",
+  "retired": false
+ },
+ "OCR-05": {
+  "text": "Check every highlighted value before applying.",
+  "used": "P-23",
+  "retired": false
+ },
+ "OCR-06": {
+  "text": "{n} values applied to the draft.",
+  "used": "P-23",
+  "retired": false
+ },
+ "OCR-07": {
+  "text": "Reading brochures is switched off. Enter values by hand.",
+  "used": "P-23",
+  "retired": false
+ },
+ "OCR-08": {
+  "text": "This value was not found in the brochure. Mark it Not stated, or type it from another source.",
+  "used": "P-23",
+  "retired": false
+ },
+ "CAT-33": {
+  "text": "UIN is required to save a product.",
+  "used": "P-22",
+  "retired": false
+ },
+ "CAT-34": {
+  "text": "The child entry band must start at 0 or more and end at or below the adult maximum age.",
+  "used": "P-22",
+  "retired": false
+ },
+ "CAT-35": {
+  "text": "Correction sent to SkyUp for review.",
+  "used": "P-58",
+  "retired": false
+ },
+ "CAT-36": {
+  "text": "Your commission for {product} is saved. Only you can see it.",
+  "used": "P-22",
+  "retired": false
+ },
+ "CAT-37": {
+  "text": "New price from {start date} saved. The current price applies until {end date}.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-38": {
+  "text": "The new price must start after {date}, when the current price began.",
+  "used": "P-24",
+  "retired": false
+ },
+ "CAT-39": {
+  "text": "SkyUp accepted your correction to {product}. It will apply once the new version is approved.",
+  "used": "P-58",
+  "retired": false
+ },
+ "CAT-40": {
+  "text": "SkyUp did not accept your correction to {product}: {reason}",
+  "used": "P-58",
+  "retired": false
+ },
+ "AI-01": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "AI-02": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "AI-03": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "AI-04": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "AI-05": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "AI-06": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "AI-07": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "AI-08": {
+  "text": "Retired in v3.1 (AI Copilot replaced by best-fit ranking, FIT).",
+  "used": "P-26",
+  "retired": true
+ },
+ "FIT-02": {
+  "text": "No products you can quote match these answers. Check your agent codes, authorised categories and prices.",
+  "used": "P-26",
+  "retired": false
+ },
+ "FIT-03": {
+  "text": "{n} products ranked. Each score shows its reason.",
+  "used": "P-26",
+  "retired": false
+ },
+ "FIT-04": {
+  "text": "Choose {CFG-44} to {CFG-45} products to compare.",
+  "used": "P-26",
+  "retired": false
+ },
+ "FIT-05": {
+  "text": "The written summary is not available right now. The scores are complete.",
+  "used": "P-26",
+  "retired": false
+ },
+ "QT-01": {
+  "text": "Quotation {number} R{revision} is ready. Share it with {customer}.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-04": {
+  "text": "Some details are no longer valid: {list}. Correct them and generate again.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-05": {
+  "text": "Add the date of birth for {name}.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-06": {
+  "text": "{Name} is {age}. This product accepts ages {min} to {max}.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-07": {
+  "text": "{Product} has no current price. Choose another product or contact SkyUp support.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-08": {
+  "text": "The insurer's rates have no premium for these details. Change the sum insured, term or people, or contact SkyUp support.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-09": {
+  "text": "The discount cannot be more than the premium before discount.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-10": {
+  "text": "The price changed since you calculated it. Review the new premium.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-11": {
+  "text": "{Product} is no longer available. Choose another product.",
+  "used": "P-27, P-28",
+  "retired": false
+ },
+ "QT-12": {
+  "text": "You have not added {insurer} with an active agent code. Add it in Settings → My insurers.",
+  "used": "P-27, P-28",
+  "retired": false
+ },
+ "QT-13": {
+  "text": "The quotation PDF could not be created. Your quotation is saved as a draft. Select Generate to try again.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-14": {
+  "text": "The price for this product changed on {date}. Revise the quotation before sharing it.",
+  "used": "P-28",
+  "retired": false
+ },
+ "QT-15": {
+  "text": "Quotation emailed to {email}.",
+  "used": "P-28",
+  "retired": false
+ },
+ "QT-16": {
+  "text": "WhatsApp opened with your message. Press send in WhatsApp to share it.",
+  "used": "P-28",
+  "retired": false
+ },
+ "QT-19": {
+  "text": "Total discounts cannot be more than the base premium plus add-ons.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-20": {
+  "text": "This quotation is no longer valid. Please contact {advisor name} on {advisor mobile} for an updated quotation.",
+  "used": "P-28",
+  "retired": false
+ },
+ "QT-21": {
+  "text": "This quotation is already paid. Record the policy instead of revising.",
+  "used": "P-29",
+  "retired": false
+ },
+ "QT-22": {
+  "text": "{Customer} has asked not to receive emails. Share another way.",
+  "used": "P-28",
+  "retired": false
+ },
+ "QT-23": {
+  "text": "Add an email address for {customer} to send by email.",
+  "used": "P-28",
+  "retired": false
+ },
+ "QT-24": {
+  "text": "You have reached today's sharing limit. Try again tomorrow.",
+  "used": "P-28",
+  "retired": false
+ },
+ "QT-25": {
+  "text": "Revision R{n} created. Generate it to replace R{n-1}.",
+  "used": "P-29",
+  "retired": false
+ },
+ "QT-26": {
+  "text": "Quotation marked as accepted. Add the payment link or update the payment status next.",
+  "used": "P-29",
+  "retired": false
+ },
+ "QT-27": {
+  "text": "Quotation marked as rejected.",
+  "used": "P-29",
+  "retired": false
+ },
+ "QT-28": {
+  "text": "Quotation cancelled. The customer's link no longer works.",
+  "used": "P-29",
+  "retired": false
+ },
+ "QT-29": {
+  "text": "Draft deleted.",
+  "used": "P-29",
+  "retired": false
+ },
+ "QT-30": {
+  "text": "Choose at least {CFG-44} and at most {CFG-45} products.",
+  "used": "P-30",
+  "retired": false
+ },
+ "QT-31": {
+  "text": "All products in a comparison must be the same insurance type.",
+  "used": "P-30",
+  "retired": false
+ },
+ "QT-32": {
+  "text": "{Product} cannot be offered for these details: {reason}. Remove it or change the details.",
+  "used": "P-30",
+  "retired": false
+ },
+ "QT-33": {
+  "text": "Comparison {number} is ready. Share it with {customer}.",
+  "used": "P-30",
+  "retired": false
+ },
+ "QT-34": {
+  "text": "{Customer}'s choice is saved. Create the quotation for {product} now?",
+  "used": "P-30",
+  "retired": false
+ },
+ "QT-35": {
+  "text": "This quotation has reached {CFG-47} revisions. Create a new quotation instead.",
+  "used": "P-29",
+  "retired": false
+ },
+ "QT-36": {
+  "text": "{Product} is already in this comparison.",
+  "used": "P-30",
+  "retired": false
+ },
+ "QT-37": {
+  "text": "A discount needs a reference. Enter it to continue.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-38": {
+  "text": "Price override applied. The calculated premium of ₹{amount} is kept on the quotation for reference.",
+  "used": "P-27",
+  "retired": false
+ },
+ "QT-40": {
+  "text": "Write the reason for recommending {product}.",
+  "used": "P-30",
+  "retired": false
+ },
+ "QT-41": {
+  "text": "Covers {n} of {m} selected people. Not covered: {names} (outside its age limits).",
+  "used": "P-26, P-30",
+  "retired": false
+ },
+ "QT-44": {
+  "text": "Expired quotations cannot become proposals. Revise it at today's price first.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PAY-01": {
+  "text": "This link is not on {insurer}'s website ({allowed domains}). Paste the link created on the insurer's portal.",
+  "used": "P-31",
+  "retired": false
+ },
+ "PAY-02": {
+  "text": "The insurer portal amount (₹{portal amount}) does not match this quotation (₹{final payable}). Revise the quotation, or check the amount on the portal.",
+  "used": "P-31",
+  "retired": false
+ },
+ "PAY-03": {
+  "text": "This quotation has reached {CFG-50} payment attempts. Create a new quotation.",
+  "used": "P-31",
+  "retired": false
+ },
+ "PAY-04": {
+  "text": "Payment link added. Share the quotation again so {customer} can pay.",
+  "used": "P-31",
+  "retired": false
+ },
+ "PAY-05": {
+  "text": "Payment recorded. You can submit the proposal now.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-06": {
+  "text": "Payment marked as failed. You can record a new payment or add a new link.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-07": {
+  "text": "Payment link marked as expired. Add a new link when ready.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-08": {
+  "text": "This transaction number is already recorded on {record}. Check the number.",
+  "used": "P-32, P-38",
+  "retired": false
+ },
+ "PAY-09": {
+  "text": "Payment undone.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-10": {
+  "text": "The proposal is already submitted. Record the insurer's decision first.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-11": {
+  "text": "Payment date cannot be in the future.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-12": {
+  "text": "Payment date cannot be before the quotation date ({date}).",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-13": {
+  "text": "The amount paid is different from the quotation. Choose a reason.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-14": {
+  "text": "Payment received on {date}, as recorded by your advisor.",
+  "used": "P-28 view link",
+  "retired": false
+ },
+ "PAY-15": {
+  "text": "The quotation expired on {date}. Revise it before recording a later payment.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-16": {
+  "text": "Enter the reference number for this {mode} payment.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-17": {
+  "text": "Cash received. Give {customer} a receipt now, and pay it to {insurer} as their rules require.",
+  "used": "P-32",
+  "retired": false
+ },
+ "PAY-18": {
+  "text": "Record the premium payment before submitting the proposal.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PRP-01": {
+  "text": "Proposal {number} started from quotation {quotation number}.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PRP-02": {
+  "text": "Answer the health declaration for {name}.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PRP-03": {
+  "text": "A declared condition may lead the insurer to raise the premium, add a waiting period or decline. Declaring it is still right: a hidden condition can void a claim.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PRP-04": {
+  "text": "Add Aadhaar and PAN for {customer} in the document vault before submitting.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PRP-05": {
+  "text": "Proposal {number} submitted. Record the policy when {insurer} issues it.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PRP-06": {
+  "text": "Covered members are locked for this proposal. Revise the quotation to change them.",
+  "used": "P-55",
+  "retired": false
+ },
+ "PRP-07": {
+  "text": "Proposal {number} marked as declined by {insurer}.",
+  "used": "P-55",
+  "retired": false
+ },
+ "POL-01": {
+  "text": "Policy {policy number} recorded. Renewal tracking has started.",
+  "used": "P-33",
+  "retired": false
+ },
+ "POL-02": {
+  "text": "Policy number {number} is already recorded for {customer}. Check the number.",
+  "used": "P-33, P-34",
+  "retired": false
+ },
+ "POL-03": {
+  "text": "Issue date cannot be before the payment date ({date}).",
+  "used": "P-33",
+  "retired": false
+ },
+ "POL-04": {
+  "text": "The policy period cannot be longer than {CFG-58} years.",
+  "used": "P-33, P-34",
+  "retired": false
+ },
+ "POL-05": {
+  "text": "The next premium due date must be between the start and end dates.",
+  "used": "P-33",
+  "retired": false
+ },
+ "POL-06": {
+  "text": "The sum insured differs from the quotation. Enter the reason.",
+  "used": "P-33",
+  "retired": false
+ },
+ "POL-07": {
+  "text": "This product needs at least one nominee. Add nominees to continue.",
+  "used": "P-33",
+  "retired": false
+ },
+ "POL-08": {
+  "text": "This policy's end date has passed. It will be saved as expired. Continue?",
+  "used": "P-34",
+  "retired": false
+ },
+ "POL-09": {
+  "text": "Existing policy {policy number} added.",
+  "used": "P-34",
+  "retired": false
+ },
+ "POL-10": {
+  "text": "Nominees saved for policy {policy number}.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-11": {
+  "text": "This policy can have up to {max} nominees.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-12": {
+  "text": "Each nominee's share must be at least {CFG-55}%.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-13": {
+  "text": "Shares must add up to {CFG-54}%. They now add up to {total}%.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-14": {
+  "text": "The policyholder cannot be their own nominee.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-15": {
+  "text": "{Name} is already a nominee on this policy.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-16": {
+  "text": "{Name} is under {CFG-56}. Add an appointee.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-17": {
+  "text": "The appointee must be {CFG-56} or older.",
+  "used": "P-35",
+  "retired": false
+ },
+ "POL-18": {
+  "text": "Policy details corrected.",
+  "used": "P-36",
+  "retired": false
+ },
+ "POL-19": {
+  "text": "Policy cancelled. Renewal reminders for it have stopped.",
+  "used": "P-36",
+  "retired": false
+ },
+ "REN-01": {
+  "text": "Contact logged. This renewal is now in follow-up.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-02": {
+  "text": "Renewal quotation started for policy {policy number}.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-03": {
+  "text": "Renewal recorded. The next renewal is due on {date}.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-04": {
+  "text": "Marked as not renewing. Customer reminders have stopped.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-05": {
+  "text": "Renewal reopened.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-06": {
+  "text": "Customer reminders for this renewal are paused.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-07": {
+  "text": "Customer reminders for this renewal are on again.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-08": {
+  "text": "The grace period ended on {date}. This renewal can no longer be reopened.",
+  "used": "P-38",
+  "retired": false
+ },
+ "REN-09": {
+  "text": "The new premium due date must be after {old date} and on or before the policy end date.",
+  "used": "P-38",
+  "retired": false
+ },
+ "COM-01": {
+  "text": "Template sent to Meta for approval. The status will update here when Meta replies.",
+  "used": "P-39",
+  "retired": false
+ },
+ "COM-02": {
+  "text": "Meta rejected this template: {reason}. Edit it and submit again.",
+  "used": "P-39",
+  "retired": false
+ },
+ "COM-03": {
+  "text": "Use only these variables for {purpose}: {list}.",
+  "used": "P-39",
+  "retired": false
+ },
+ "COM-04": {
+  "text": "WhatsApp messages can have up to {CFG-138} characters.",
+  "used": "P-39",
+  "retired": false
+ },
+ "COM-05": {
+  "text": "An active {purpose} template already exists. Deactivate it first.",
+  "used": "P-39",
+  "retired": false
+ },
+ "COM-06": {
+  "text": "Greeting settings saved.",
+  "used": "P-40",
+  "retired": false
+ },
+ "COM-07": {
+  "text": "Could not get the latest status from WhatsApp. Showing the last known status.",
+  "used": "P-39",
+  "retired": false
+ },
+ "COM-08": {
+  "text": "Automatic greetings are off. Queued greetings have been cancelled.",
+  "used": "P-40",
+  "retired": false
+ },
+ "COM-09": {
+  "text": "Choose a template for each occasion before turning greetings on.",
+  "used": "P-40",
+  "retired": false
+ },
+ "COM-10": {
+  "text": "Message cancelled.",
+  "used": "P-43",
+  "retired": false
+ },
+ "COM-11": {
+  "text": "Message queued again. Its status will update here.",
+  "used": "P-43",
+  "retired": false
+ },
+ "COM-12": {
+  "text": "This message can no longer be resent.",
+  "used": "P-43",
+  "retired": false
+ },
+ "REF-01": {
+  "text": "Referrer {name} added. Share the invitation with them.",
+  "used": "P-44",
+  "retired": false
+ },
+ "REF-02": {
+  "text": "This mobile number already has Bimayantra access. Use a different number.",
+  "used": "P-44, P-48",
+  "retired": false
+ },
+ "REF-03": {
+  "text": "You can have up to {CFG-76} active referrers.",
+  "used": "P-44",
+  "retired": false
+ },
+ "REF-04": {
+  "text": "This referral link is not active. Please contact the person who shared it.",
+  "used": "P-46, P-51",
+  "retired": false
+ },
+ "REF-05": {
+  "text": "Thank you, {first name}. {Advisor name} will contact you soon.",
+  "used": "P-46",
+  "retired": false
+ },
+ "REF-06": {
+  "text": "New referral link created. The old link no longer works.",
+  "used": "P-44",
+  "retired": false
+ },
+ "REF-07": {
+  "text": "Referrer {name} disabled. Their link no longer works.",
+  "used": "P-44",
+  "retired": false
+ },
+ "REF-08": {
+  "text": "Your referral {prospect first name} is now: {status}.",
+  "used": "P-10, P-45",
+  "retired": false
+ },
+ "REF-09": {
+  "text": "Too many submissions from this device. Please try again later.",
+  "used": "P-46",
+  "retired": false
+ },
+ "REF-12": {
+  "text": "Your referral link expired on {date}. Ask {advisor name} for a new link.",
+  "used": "P-45",
+  "retired": false
+ },
+ "SUB-01": {
+  "text": "Automated WhatsApp greetings and reminders are available on the Premium plan.",
+  "used": "P-40, GR-29",
+  "retired": false
+ },
+ "SUB-03": {
+  "text": "Your subscription has ended. You can view and export your records, but you cannot create, edit or send anything until you renew.",
+  "used": "GR-33, P-02",
+  "retired": false
+ },
+ "SUB-04": {
+  "text": "Your free trial ends in {days} days.",
+  "used": "P-08",
+  "retired": false
+ },
+ "SUB-05": {
+  "text": "Your plan ended on {date}. Renew within {days} days to keep full access.",
+  "used": "P-08",
+  "retired": false
+ },
+ "SUB-06": {
+  "text": "Retired in v3.1 (plans are paid online, P-47).",
+  "used": "P-47",
+  "retired": true
+ },
+ "SUB-07": {
+  "text": "Retired in v3.1.",
+  "used": "P-47",
+  "retired": true
+ },
+ "SUB-14": {
+  "text": "Payment received. Your {plan} plan is active until {end date}. Your GST invoice has been emailed.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-08": {
+  "text": "The new period overlaps the current period that ends on {date}. Start it on {next date}, or choose Replace current period.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-09": {
+  "text": "Premium features stop on {date}. Automatic WhatsApp messages will be switched off and queued messages cancelled. Continue?",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-10": {
+  "text": "This payment reference is already recorded for {account}. Check the reference.",
+  "used": "P-47",
+  "retired": false
+ },
+ "ADM-01": {
+  "text": "{Name} added as {role}. They can log in with their mobile number.",
+  "used": "P-48",
+  "retired": false
+ },
+ "ADM-02": {
+  "text": "At least one SkyUp Admin must stay active.",
+  "used": "P-48",
+  "retired": false
+ },
+ "ADM-03": {
+  "text": "You cannot disable or change your own access.",
+  "used": "P-48",
+  "retired": false
+ },
+ "ADM-04": {
+  "text": "Change sent for approval.",
+  "used": "P-49",
+  "retired": false
+ },
+ "ADM-05": {
+  "text": "Enter a value from {min} to {max}.",
+  "used": "P-49",
+  "retired": false
+ },
+ "ADM-06": {
+  "text": "Change applied. The new value is used from now on.",
+  "used": "P-49",
+  "retired": false
+ },
+ "ADM-07": {
+  "text": "Account suspended. The advisor and their referrers can no longer log in.",
+  "used": "P-51",
+  "retired": false
+ },
+ "ADM-08": {
+  "text": "Account reactivated.",
+  "used": "P-51",
+  "retired": false
+ },
+ "ADM-09": {
+  "text": "Account closed. Data will be kept until {date} and then deleted.",
+  "used": "P-51",
+  "retired": false
+ },
+ "ADM-10": {
+  "text": "Your export is being prepared. We will tell you when it is ready.",
+  "used": "P-52",
+  "retired": false
+ },
+ "ADM-11": {
+  "text": "Your export is ready. Download it within {CFG-113} hours.",
+  "used": "P-52",
+  "retired": false
+ },
+ "ADM-12": {
+  "text": "You can create up to {CFG-114} exports a day.",
+  "used": "P-52",
+  "retired": false
+ },
+ "ADM-13": {
+  "text": "Your export could not be prepared. Please try again.",
+  "used": "P-52",
+  "retired": false
+ },
+ "SUB-11": {
+  "text": "Your free trial ends on {date}. Choose a plan to keep full access. Your data stays safe either way.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-12": {
+  "text": "Your payment was declined. No money was taken. Try another payment method.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-13": {
+  "text": "Your payment is being confirmed. Your plan will update automatically in a few minutes.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-15": {
+  "text": "Your dedicated WhatsApp number is being set up. This takes up to {CFG-165} working days.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-16": {
+  "text": "Your WhatsApp Business number {number} is ready. You can now switch on automated messages.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-17": {
+  "text": "We could not confirm your payment. If money was taken, your bank will return it. Please try again.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-18": {
+  "text": "Payments are not available right now. Nothing was charged. Try again in a few minutes.",
+  "used": "P-47",
+  "retired": false
+ },
+ "SUB-19": {
+  "text": "Payment was not completed. Your plan has not changed.",
+  "used": "P-47",
+  "retired": false
+ },
+ "AST-01": {
+  "text": "Assistant {name} added. They can log in with their mobile number.",
+  "used": "P-53",
+  "retired": false
+ },
+ "AST-02": {
+  "text": "Your plan allows up to {CFG-158} assistants.",
+  "used": "P-53",
+  "retired": false
+ },
+ "AST-03": {
+  "text": "Assistant {name} can no longer log in.",
+  "used": "P-53",
+  "retired": false
+ },
+ "AST-04": {
+  "text": "Assistant users are available on the Premium plan.",
+  "used": "P-53",
+  "retired": false
+ },
+ "WAL-01": {
+  "text": "Wallet recharged by ₹{amount}. New balance: ₹{balance}.",
+  "used": "P-56",
+  "retired": false
+ },
+ "WAL-02": {
+  "text": "Your WhatsApp wallet balance is low (₹{balance}). Recharge to keep automated messages going.",
+  "used": "P-56",
+  "retired": false
+ },
+ "WAL-03": {
+  "text": "Automated WhatsApp messages are paused because the wallet balance is too low. Recharge to resume.",
+  "used": "P-56",
+  "retired": false
+ },
+ "WAL-04": {
+  "text": "The smallest recharge is ₹{CFG-163}.",
+  "used": "P-56",
+  "retired": false
+ },
+ "WAL-05": {
+  "text": "The recharge did not go through. No money was taken.",
+  "used": "P-56",
+  "retired": false
+ },
+ "SUP-01": {
+  "text": "Support access given to {name} until {time}.",
+  "used": "P-57",
+  "retired": false
+ },
+ "SUP-02": {
+  "text": "Support access ended.",
+  "used": "P-57",
+  "retired": false
+ },
+ "SUP-03": {
+  "text": "You need a support grant from this advisor to open client details.",
+  "used": "P-57",
+  "retired": false
+ },
+ "PWD-01": {
+  "text": "Use at least 8 characters with a capital letter, a small letter, a number and a symbol.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-02": {
+  "text": "The mobile number or password is incorrect. {tries} tries left before a {CFG-06}-minute lock.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-03": {
+  "text": "No password is set for this number yet. Log in with OTP, then set one in Settings → Security.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-04": {
+  "text": "Too many wrong passwords. Try again after {time}, or log in with OTP.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-05": {
+  "text": "Password saved. You can log in with OTP or with your password.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-06": {
+  "text": "Password removed. Log in with OTP.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-07": {
+  "text": "The password must not contain your mobile number.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-08": {
+  "text": "This password is too common. Choose a different one.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ },
+ "PWD-09": {
+  "text": "The two passwords do not match.",
+  "used": "Password login (extra, not in BPD v3.2)",
+  "retired": false
+ }
+}
